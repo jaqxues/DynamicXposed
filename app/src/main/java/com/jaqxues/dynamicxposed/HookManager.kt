@@ -25,14 +25,10 @@ const val MOD_NAME = "Instaprefs"
 @Suppress("DEPRECATION")
 class HookManager: IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (lpparam.packageName != APP_PKG)
+        if (lpparam.packageName != APP_PKG || !lpparam.isFirstApplication)
             return
 
-        Timber.plant(object: Timber.DebugTree() {
-            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                super.log(priority, tag, "[Dynamic Xposed] - $message", t)
-            }
-        })
+        Common.plant()
 
         Timber.d("Opened $APP_NAME. Dynamically Loading $MOD_NAME...")
         Timber.d("Hooking onAttach")
@@ -42,7 +38,7 @@ class HookManager: IXposedHookLoadPackage {
                 Timber.d("Called onAttach. Loading Apk with provided App Context")
 
                 try {
-                    val classLoader = loadApk(File(Environment.getExternalStorageDirectory(), "DynamicXposedModule/Dynamic_Module.apk"), param.args[0] as Context)
+                    val classLoader = Common.loadApk(File(Environment.getExternalStorageDirectory(), "DynamicXposedModule/Dynamic_Module.apk"), param.args[0] as Context)
 
                     val hookClass = classLoader.loadClass(MOD_CLS)
                     val hookObj = hookClass.newInstance()

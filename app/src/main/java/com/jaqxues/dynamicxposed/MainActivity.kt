@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Common.plant()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             val listener = View.OnClickListener {
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         load_apk_classloader.setOnClickListener {
             try {
                 val classLoader =
-                    loadApk(
+                    Common.loadApk(
                         File(Environment.getExternalStorageDirectory(), "DynamicXposedModule/Dynamic_Module.apk"),
                         this
                     )

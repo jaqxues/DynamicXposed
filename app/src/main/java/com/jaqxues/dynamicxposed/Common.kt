@@ -12,17 +12,25 @@ import java.io.FileNotFoundException
  * Date: 24.04.20 - Time 14:46.
  */
 
-class Common
+object Common {
+    fun loadApk(apk: File, context: Context): ClassLoader {
+        if (!apk.exists())
+            throw FileNotFoundException("File does not exist. Aborting Loading External APK")
 
-fun loadApk(apk: File, context: Context): ClassLoader {
-    if (!apk.exists())
-        throw FileNotFoundException("File does not exist. Aborting Loading External APK")
+        Timber.d("Loading APK on Path ${apk.absolutePath}")
 
-    Timber.d("Loading APK on Path ${apk.absolutePath}")
+        return DexClassLoader(
+            apk.absolutePath,
+            context.codeCacheDir.absolutePath,
+            null, Common::class.java.classLoader
+        )
+    }
 
-    return DexClassLoader(
-        apk.absolutePath,
-        context.codeCacheDir.absolutePath,
-        null, Common::class.java.classLoader
-    )
+    fun plant() {
+        Timber.plant(object: Timber.DebugTree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                super.log(priority, tag, "[Dynamic Xposed] - $message", t)
+            }
+        })
+    }
 }
